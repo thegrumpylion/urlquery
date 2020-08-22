@@ -14,6 +14,9 @@ func Marshal(i interface{}, name string) (string, error) {
 }
 
 func marshal(v reflect.Value, name string) (string, error) {
+	if !v.IsValid() {
+		return "", nil
+	}
 	t := v.Type()
 	if isPtr(t) {
 		if v.IsNil() {
