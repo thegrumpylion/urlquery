@@ -8,7 +8,11 @@ import (
 	"strings"
 )
 
-func Marshal(i interface{}, name string) (string, error) {
+func Marshal(i interface{}) (string, error) {
+	return MarshalName(i, "")
+}
+
+func MarshalName(i interface{}, name string) (string, error) {
 	v := reflect.ValueOf(i)
 	return marshal(v, name)
 }
@@ -47,6 +51,9 @@ func marshalStruct(v reflect.Value, name string) (string, error) {
 		fv := v.Field(i)
 		fn := name + fld.Name
 		if tag, ok := fld.Tag.Lookup("url"); ok {
+			if tag == "-" {
+				continue
+			}
 			fn = tag
 		}
 		if !fv.CanSet() {

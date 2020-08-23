@@ -46,7 +46,7 @@ func (v *values) Keys(pfx string) []string {
 	return out
 }
 
-func Unmarshal(i interface{}, q string) error {
+func UnmarshalName(i interface{}, name, q string) error {
 	v := reflect.ValueOf(i)
 	if !isPtr(v.Type()) {
 		return errors.New("input should be a pointer. try with &")
@@ -55,7 +55,11 @@ func Unmarshal(i interface{}, q string) error {
 	if err != nil {
 		return err
 	}
-	return unmarshal(v, "", &values{vals})
+	return unmarshal(v, name, &values{vals})
+}
+
+func Unmarshal(i interface{}, q string) error {
+	return UnmarshalName(i, "", q)
 }
 
 func unmarshal(v reflect.Value, name string, vals *values) error {
@@ -208,6 +212,9 @@ func unmarshalStruct(v reflect.Value, name string, vals *values) error {
 		}
 		fldName := fld.Name
 		if tag, ok := fld.Tag.Lookup("url"); ok {
+			if tag == "-" {
+				continue
+			}
 			fldName = tag
 		}
 		fn := name + fldName
